@@ -1,0 +1,7 @@
+{
+	"configs": [
+		"dist/libs/db.js",
+		"dist/libs/http_request.js",
+		"dist/libs/strings.js"
+	]
+}

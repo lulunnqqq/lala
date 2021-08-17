@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "strictNullChecks": false,
+    "sourceMap": false,
+    "outDir": "dist",
+    "baseUrl": "./ts",
+    "removeComments": true,
+    "skipLibCheck": true,
+    "declaration": false,
+    "skipDefaultLibCheck": true
+  },
+  "include": [
+    "ts"
+  ]
+}

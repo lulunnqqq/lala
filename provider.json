@@ -1,0 +1,24 @@
+{
+	"providers": [
+        "dist/providers/vumoo.js",
+		"dist/providers/ronemo.js",
+        "dist/providers/losmovie.js",
+		"dist/providers/xmovies8.js",
+        "dist/providers/123moviesfull.js",
+        "dist/providers/openloadmovies.js",
+        "dist/providers/top123movieslive.js",
+        "dist/providers/123moviesV2.js",
+        "dist/providers/m4ufree.js",
+        "dist/providers/solarmovies.js",
+        "dist/providers/srsone.js",
+        "dist/providers/miradetodo.js",
+        "dist/providers/couchtuner.js",
+        "dist/providers/watchepisodes4.js",
+        "dist/providers/primewire.js",
+        "dist/providers/putlocker123.js",
+        "dist/providers/watchserieshd.js",
+        "dist/providers/123moviescc.js",
+        "dist/providers/putlocker.js",
+        "dist/providers/5movies.js"
+	]
+}
