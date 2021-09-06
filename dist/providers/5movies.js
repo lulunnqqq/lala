@@ -36,149 +36,141 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 source.getResource = function (movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
-    var domain, urlSearch, htmlSearch, parseSearch, link, token, urlDetail, responseDetail, parseDetail, tokenIds, embeds, arrMap, arrHost;
+    var DOMAIN, PROVIDER, URL_SEARCH, cheerioSearch, LINK_DETAIL, token, urlDetail, responseDetail, parseDetail, tokenIds, embeds, embedsMap, arrHost;
     var _this = this;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                domain = "https://5movies.cloud";
-                urlSearch = domain + "/movie/search/" + slugify(movieInfo.title, { lower: true, replacement: '+' });
-                return [4, libs.request_get(urlSearch)];
+                DOMAIN = "https://5movies.cloud";
+                PROVIDER = '5MOVIES';
+                URL_SEARCH = DOMAIN + "/movie/search/" + libs.url_slug_search(movieInfo, '+');
+                return [4, libs.request_get(URL_SEARCH, {}, true)];
             case 1:
-                htmlSearch = _a.sent();
-                parseSearch = cheerio.load(htmlSearch);
-                link = "";
-                console.log(parseSearch(".ml-item").length, "-------- 5MOVIES SEARCH INFO -------");
-                parseSearch(".ml-item").each(function (keySearch, itemSearch) {
-                    var title = parseSearch(itemSearch).find(".mli-info h2").text();
-                    title = title.replace(/\( *[0-9]+ *\)/i, '').trim();
-                    var season = title.toLowerCase().match(/\- *season *([0-9]+)/i);
-                    season = season ? season[1] : 0;
-                    title = title.toLowerCase().replace(/\- *season [0-9]+/i, "").trim();
-                    var href = parseSearch(itemSearch).find(".ml-mask").attr("href");
-                    console.log(title, season, href, "-------- 5MOVIES DETAIL INFO -------");
-                    if (slugify(movieInfo.title, { lower: true }) == slugify(title.trim(), { lower: true })) {
-                        if (movieInfo.type == "movie") {
-                            link = href;
-                        }
-                        if (movieInfo.type == "tv" && season == movieInfo.season) {
-                            link = href;
+                cheerioSearch = _a.sent();
+                LINK_DETAIL = '';
+                libs.log(cheerioSearch('.ml-item').length, PROVIDER, 'SEARCH DETAIL');
+                cheerioSearch('.ml-item').each(function (key, item) {
+                    var title = cheerioSearch(item).find('.mli-info h2').text();
+                    var href = cheerioSearch(item).find('.ml-mask').attr('href');
+                    if (href && title) {
+                        var titleSeason = libs.string_get_season_tvshow(title);
+                        libs.log(titleSeason, PROVIDER, 'TITLE SEASON');
+                        if (libs.string_matching_title(movieInfo, titleSeason.new_title)) {
+                            if (movieInfo.type == 'movie') {
+                                LINK_DETAIL = "" + DOMAIN + href;
+                            }
+                            else if (movieInfo.type == 'tv' && movieInfo.season == titleSeason.season) {
+                                LINK_DETAIL = "" + DOMAIN + href;
+                            }
                         }
                     }
                 });
-                console.log(link, "-------- 5MOVIES DETAIL INFO -------");
-                if (!link) {
+                libs.log(LINK_DETAIL, PROVIDER, 'LINK DETAIL');
+                if (!LINK_DETAIL) {
                     return [2];
                 }
-                link = "" + domain + link;
-                token = link.match(/\-([0-9]+)\/$/i);
+                token = LINK_DETAIL.match(/\-([0-9]+)\/$/i);
                 token = token ? token[1] : 0;
-                console.log(token, "-------- 5MOVIES TOKEN -------");
+                libs.log(token, PROVIDER, 'TOKEN');
                 if (!token) {
                     return [2];
                 }
-                urlDetail = domain + "/ajax/movie_episodes/" + token;
-                return [4, libs.request_get(urlDetail, {}, 'json')];
+                urlDetail = DOMAIN + "/ajax/movie_episodes/" + token;
+                return [4, libs.request_get(urlDetail, {})];
             case 2:
                 responseDetail = _a.sent();
-                console.log(urlDetail, responseDetail, "-------- 5MOVIES DETAIL -------");
+                libs.log({ urlDetail: urlDetail, responseDetail: responseDetail }, PROVIDER, 'MOVIE DETAIL');
                 if (responseDetail.status != 1 || !responseDetail.html) {
                     return [2];
                 }
                 parseDetail = cheerio.load(responseDetail.html);
                 tokenIds = [];
-                if (movieInfo.type == 'movie') {
-                    parseDetail('a.btn-eps').each(function (keyDetail, itemDetail) {
-                        var id = parseDetail(itemDetail).attr('data-id');
-                        if (id) {
+                libs.log(parseDetail('a.btn-eps').length, PROVIDER, 'LENGTH DETAIL');
+                parseDetail('a.btn-eps').each(function (key, item) {
+                    var episode = parseDetail(item).text();
+                    episode = episode.match(/episode *([0-9]+)/i);
+                    episode = episode ? episode[1] : 0;
+                    var id = parseDetail(item).attr('data-id');
+                    if (id) {
+                        if (movieInfo.type == 'tv') {
+                            libs.log({ episode: episode, id: id }, PROVIDER, 'TOKEN EPISODE ID');
+                            if (episode == movieInfo.episode) {
+                                tokenIds.push(id);
+                            }
+                        }
+                        else {
                             tokenIds.push(id);
                         }
-                    });
+                    }
+                });
+                libs.log(tokenIds, PROVIDER, 'TOKEN IDS');
+                if (tokenIds.length == 0) {
+                    return [2];
                 }
-                else {
-                    parseDetail('a.btn-eps').each(function (keyDetail, itemDetail) {
-                        var episode = parseDetail(itemDetail).text();
-                        episode = episode.match(/episode *([0-9]+)/i);
-                        episode = episode ? episode[1] : 0;
-                        var id = parseDetail(itemDetail).attr('data-id');
-                        console.log(episode, id, "-------- 5MOVIES TOKEN EPISODE ID -------");
-                        if (id && episode == movieInfo.episode) {
-                            tokenIds.push(id);
-                        }
-                    });
-                }
-                console.log(tokenIds, "-------- 5MOVIES TOKEN IDS -------");
                 embeds = [];
-                arrMap = tokenIds.map(function (id) { return __awaiter(_this, void 0, void 0, function () {
+                embedsMap = tokenIds.map(function (id) { return __awaiter(_this, void 0, void 0, function () {
                     var urlEmbed, resultEmbed;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
-                                urlEmbed = domain + "/ajax/movie_embed/" + id;
-                                return [4, libs.request_get(urlEmbed, {}, 'json')];
+                                urlEmbed = DOMAIN + "/ajax/movie_embed/" + id;
+                                return [4, libs.request_get(urlEmbed, {})];
                             case 1:
                                 resultEmbed = _a.sent();
-                                console.log(urlEmbed, resultEmbed, "-------- 5MOVIES REQUEST EMBED -------");
-                                if (resultEmbed.status && resultEmbed.src) {
+                                libs.log({ urlEmbed: urlEmbed, resultEmbed: resultEmbed }, PROVIDER, 'REQUEST EMBED');
+                                if (resultEmbed && resultEmbed.status && resultEmbed.src) {
                                     embeds.push(resultEmbed.src);
                                 }
                                 return [2];
                         }
                     });
                 }); });
-                return [4, Promise.all(arrMap)];
+                return [4, Promise.all(embedsMap)];
             case 3:
                 _a.sent();
-                console.log(embeds, "-------- 5MOVIES EMBEDS -------");
+                libs.log(embeds, PROVIDER, 'EMBEDS');
+                if (embeds.length == 0) {
+                    return [2];
+                }
                 arrHost = embeds.map(function (urlHost) { return __awaiter(_this, void 0, void 0, function () {
-                    var fileSize, host, html, source, parse, length_1, i, file, quality;
+                    var host, html, parseSource, length_1, i, file, quality;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
-                            case 0: return [4, libs.request_getFileSize(urlHost)];
-                            case 1:
-                                fileSize = _a.sent();
-                                host = libs.string_getHost(urlHost);
-                                console.log(urlHost, fileSize, host, "embed.u--------------------");
-                                if (!(host.indexOf('stream365') != -1)) return [3, 3];
+                            case 0:
+                                host = libs.url_get_host(urlHost);
+                                libs.log({ host: host, urlHost: urlHost }, PROVIDER, 'HOST');
+                                if (!(host && host.indexOf('stream365') != -1)) return [3, 2];
                                 return [4, libs.request_get(urlHost, {
-                                        Referer: domain
-                                    }, "html")];
-                            case 2:
+                                        Referer: DOMAIN
+                                    })];
+                            case 1:
                                 html = _a.sent();
-                                source = html.match(/sources *\: *([^\]]+)/i);
-                                source = source ? source[1] + "]" : "[]";
-                                parse = [];
-                                source = "parse = " + source;
-                                eval(source);
-                                console.log(parse, urlHost, "------------ SOURCES STREAM 5MOVIES -------------");
-                                length_1 = parse.length;
+                                parseSource = libs.embed_parse_source(html);
+                                libs.log({ parseSource: parseSource, urlHost: urlHost }, PROVIDER, 'SOURCE STREAM');
+                                length_1 = parseSource.length;
                                 for (i = 0; i < length_1; i++) {
-                                    file = parse[i].file;
-                                    quality = parse[i].label;
-                                    console.log(parse[i], "------------ SOURCE DETAIL STREAM 5MOVIES -------------");
+                                    if (!parseSource[i]) {
+                                        continue;
+                                    }
+                                    file = parseSource[i].file;
+                                    quality = parseSource[i].label;
+                                    if (!file) {
+                                        continue;
+                                    }
+                                    libs.log(parseSource[i], PROVIDER, 'SOURCE DETAIL PARSE');
+                                    console.log(parseSource[i], "------------ SOURCE DETAIL STREAM 5MOVIES -------------");
                                     callback({
                                         file: file,
                                         host: 'Stream365',
-                                        provider: "5Movies",
+                                        provider: PROVIDER,
                                         quality: quality,
+                                        headers: {
+                                            Referer: urlHost,
+                                        }
                                     });
                                 }
-                                _a.label = 3;
-                            case 3:
-                                if (fileSize == 0) {
-                                    if (hosts[host]) {
-                                        hosts[host](urlHost, movieInfo, _.merge(config, { provider: "5Movies", urlDetail: link }), callback);
-                                    }
-                                }
-                                else {
-                                    callback({
-                                        file: urlHost,
-                                        size: fileSize,
-                                        host: host.toUpperCase(),
-                                        provider: "5Movies"
-                                    });
-                                }
-                                return [2];
+                                _a.label = 2;
+                            case 2: return [2];
                         }
                     });
                 }); });

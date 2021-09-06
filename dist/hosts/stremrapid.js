@@ -35,45 +35,73 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-hosts["vidmoly"] = function (url, movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
-    var html, source, parse, length, i, file, fileSize;
+hosts["vidembed"] = function (url, movieInfo, provider, config, callback) { return __awaiter(_this, void 0, void 0, function () {
+    var DOMAIN, HOST, htmlDetail, parseHtml, embeds, sources, sourceItem, source, parse, length_1, i, file, quality, _i, embeds_1, embedItem;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4, libs.request_get(url, {
-                    "user-agent": libs.request_getRandomUserAgent()
-                }, "html")];
+            case 0:
+                DOMAIN = 'https://vidembed.cc';
+                HOST = 'VIDEMBED';
+                return [4, libs.request_get(url, {})];
             case 1:
-                html = _a.sent();
-                source = html.match(/sources *\: *([^\]]+)/i);
-                source = source ? source[1] + "]" : "[]";
+                htmlDetail = _a.sent();
+                parseHtml = cheerio.load(htmlDetail);
+                embeds = [];
+                sources = htmlDetail.match(/sources *\: *([^\]]+)/im);
+                sources = sources ? sources : [];
+                libs.log(sources.length, HOST, 'SOURCE LENGTH');
+                sourceItem = 1;
+                _a.label = 2;
+            case 2:
+                if (!(sourceItem < sources.length)) return [3, 7];
+                source = sources[sourceItem] ? sources[sourceItem] + "]" : "[]";
                 parse = [];
                 source = "parse = " + source;
                 eval(source);
-                console.log(parse, "------------ SOURCES VIDMOLY -------------");
-                length = parse.length;
+                libs.log(parse, HOST, 'SOURCES');
+                length_1 = parse.length;
                 i = 0;
-                _a.label = 2;
-            case 2:
-                if (!(i < length)) return [3, 5];
-                file = parse[i].file;
-                console.log(parse[i], "------------ SOURCE DETAIL VIDMOLY -------------");
-                return [4, libs.request_getFileSize(file)];
+                _a.label = 3;
             case 3:
-                fileSize = _a.sent();
-                if (fileSize > 0) {
-                    callback({
-                        file: file,
-                        size: fileSize,
-                        host: "Vidmoly",
-                        quality: parse[i].label ? parse[i].label : "",
-                        provider: config.provider
-                    });
-                }
-                _a.label = 4;
+                if (!(i < length_1)) return [3, 6];
+                file = parse[i].file;
+                quality = parse[i].label;
+                if (!file) return [3, 5];
+                return [4, libs.embed_redirect(file, quality ? quality.replace(' ', '') : '', movieInfo, provider, callback)];
             case 4:
+                _a.sent();
+                _a.label = 5;
+            case 5:
                 i++;
+                return [3, 3];
+            case 6:
+                sourceItem++;
                 return [3, 2];
-            case 5: return [2];
+            case 7:
+                libs.log(parseHtml('.linkserver').length, HOST, 'LINK SERVER LENGTH');
+                parseHtml('.linkserver').each(function (key, item) {
+                    var linkServer = parseHtml(item).attr('data-video');
+                    if (linkServer) {
+                        if (_.startsWith(linkServer, '/')) {
+                            linkServer = 'https:' + linkServer;
+                        }
+                        embeds.push(linkServer);
+                    }
+                });
+                libs.log(embeds, HOST, 'EMBEDS');
+                _i = 0, embeds_1 = embeds;
+                _a.label = 8;
+            case 8:
+                if (!(_i < embeds_1.length)) return [3, 11];
+                embedItem = embeds_1[_i];
+                return [4, libs.embed_redirect(embedItem, '', movieInfo, provider, callback, HOST)];
+            case 9:
+                _a.sent();
+                _a.label = 10;
+            case 10:
+                _i++;
+                return [3, 8];
+            case 11: return [2];
         }
     });
 }); };

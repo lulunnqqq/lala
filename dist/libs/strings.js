@@ -1,21 +1,13 @@
-libs.string_getHost = function (url, isReal) {
-    if (isReal === void 0) { isReal = false; }
-    if (url.toLowerCase().indexOf('google') != -1 && !isReal) {
-        return "Google Video";
-    }
-    if (url.toLowerCase().indexOf('loadshare') != -1 && !isReal) {
-        return "LOADSHARE CDN";
-    }
-    if (url.toLowerCase().indexOf('dropbox') != -1 && !isReal) {
-        return "DROPBOX";
-    }
-    var hostName = url.match(/^:?\/\/|https?:\/\/([^/]*@)?(.+?)(:\d{2,5})?([/?].*)?$/i);
-    if (!hostName || hostName.length == 0) {
-        return "";
-    }
-    hostName = hostName[2].replace("www.", "");
-    hostName = hostName.replace("\r", "");
-    return hostName.replace(/\.[A-z]+$/, "");
+libs.string_matching_title = function (movieInfo, titleSearch) {
+    return slugify(movieInfo.title, { lower: true, replacement: '+', remove: /[*+~.()'"!:@]/g }) == slugify(titleSearch, { lower: true, replacement: '+', remove: /[*+~.()'"!:@]/g });
+};
+libs.string_get_season_tvshow = function (title) {
+    var season = title.toLowerCase().match(/\- *season *([0-9]+)/i);
+    season = season ? season[1] : 0;
+    return {
+        new_title: title.toLowerCase().replace(/\- *season [0-9]+/i, "").trim(),
+        season: season,
+    };
 };
 libs.string_btoa = function (input) {
     var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
@@ -41,68 +33,5 @@ libs.string_atob = function (input) {
         bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0) {
         buffer = chars.indexOf(buffer);
     }
-    return output;
-};
-libs.string_base64_encode = function (input) {
-    var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-    var output = "";
-    var chr1, chr2, chr3 = "";
-    var enc1, enc2, enc3, enc4 = "";
-    var i = 0;
-    do {
-        chr1 = input.charCodeAt(i++);
-        chr2 = input.charCodeAt(i++);
-        chr3 = input.charCodeAt(i++);
-        enc1 = chr1 >> 2;
-        enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-        enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-        enc4 = chr3 & 63;
-        if (isNaN(chr2)) {
-            enc3 = enc4 = 64;
-        }
-        else if (isNaN(chr3)) {
-            enc4 = 64;
-        }
-        output = output +
-            keyStr.charAt(enc1) +
-            keyStr.charAt(enc2) +
-            keyStr.charAt(enc3) +
-            keyStr.charAt(enc4);
-        chr1 = chr2 = chr3 = "";
-        enc1 = enc2 = enc3 = enc4 = "";
-    } while (i < input.length);
-    return output;
-};
-libs.string_base64_decode = function (input) {
-    var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-    var output = "";
-    var chr1, chr2, chr3 = "";
-    var enc1, enc2, enc3, enc4 = "";
-    var i = 0;
-    var base64test = /[^A-Za-z0-9\+\/\=]/g;
-    if (base64test.exec(input)) {
-        window.alert("There were invalid base64 characters in the input text.\n" +
-            "Valid base64 characters are A-Z, a-z, 0-9, '+', '/',and '='\n" +
-            "Expect errors in decoding.");
-    }
-    input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-    do {
-        enc1 = keyStr.indexOf(input.charAt(i++));
-        enc2 = keyStr.indexOf(input.charAt(i++));
-        enc3 = keyStr.indexOf(input.charAt(i++));
-        enc4 = keyStr.indexOf(input.charAt(i++));
-        chr1 = (enc1 << 2) | (enc2 >> 4);
-        chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-        chr3 = ((enc3 & 3) << 6) | enc4;
-        output = output + String.fromCharCode(chr1);
-        if (enc3 != 64) {
-            output = output + String.fromCharCode(chr2);
-        }
-        if (enc4 != 64) {
-            output = output + String.fromCharCode(chr3);
-        }
-        chr1 = chr2 = chr3 = "";
-        enc1 = enc2 = enc3 = enc4 = "";
-    } while (i < input.length);
     return output;
 };

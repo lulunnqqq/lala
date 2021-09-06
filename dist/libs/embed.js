@@ -35,8 +35,61 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-hosts["afdah"] = function (url, movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
+libs.embed_redirect = function (embed, quality, movieInfo, provider, callback, host) { return __awaiter(_this, void 0, void 0, function () {
+    var hostname, headersData, contentLength;
     return __generator(this, function (_a) {
-        return [2];
+        switch (_a.label) {
+            case 0:
+                if (!embed) {
+                    return [2];
+                }
+                hostname = libs.url_get_host(embed);
+                libs.log({ hostname: hostname, embed: embed }, provider, 'EMBED HOST');
+                if (embed.indexOf('.m3u8') != -1 || embed.indexOf('.hls') != -1) {
+                    callback({
+                        file: embed,
+                        host: host ? host : hostname.toUpperCase(),
+                        provider: provider,
+                        quality: 'HLS',
+                    });
+                    return [2];
+                }
+                if (!hostname) {
+                    return [2];
+                }
+                if (quality) {
+                    callback({
+                        file: embed,
+                        quality: quality,
+                        host: host ? host : hostname.toUpperCase(),
+                        provider: provider,
+                    });
+                }
+                if (hosts && hosts[hostname]) {
+                    hosts[hostname](embed, movieInfo, provider, {}, callback);
+                    return [2];
+                }
+                return [4, libs.request_head(embed, {})];
+            case 1:
+                headersData = _a.sent();
+                contentLength = headersData['content-length'];
+                if (contentLength > 100000000) {
+                    callback({
+                        file: embed,
+                        size: contentLength,
+                        host: host ? host : hostname.toUpperCase(),
+                        provider: provider,
+                    });
+                }
+                return [2];
+        }
     });
 }); };
+libs.embed_parse_source = function (html) {
+    var source = html.match(/sources *\: *([^\]]+)/i);
+    source = source ? source[1] + "]" : "[]";
+    var parse = [];
+    source = "parse = " + source;
+    eval(source);
+    return parse;
+};

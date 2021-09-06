@@ -35,12 +35,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-hosts["vidsrc"] = function (url, movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
-    var urlReal, htmlDetail, parseDetail, tokens, headers, arrMap;
+hosts["voe"] = function (url, movieInfo, provider, config, callback) { return __awaiter(_this, void 0, void 0, function () {
+    var uttf0, urlReal, htmlDetail, parseDetail, tokens, headers, arrMap;
     var _this = this;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                uttf0 = function (uttp0) {
+                    uttp0 = uttp0.join('');
+                    uttp0 = uttp0.split('').reverse().join('');
+                    ;
+                    return atob(uttp0);
+                };
                 urlReal = url.replace('vidsrc', 'v2.vidsrc');
                 return [4, libs.request_get(urlReal)];
             case 1:

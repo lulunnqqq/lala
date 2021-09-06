@@ -35,41 +35,53 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-hosts["streamm4u"] = function (url, movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
-    var urlStream, headers, body, resultStream, directs, _i, directs_1, directItem;
+source.getResource = function (movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
+    var PROVIDER, DOMAIN, urlSearch, parseSearch, embeds, arrMap;
+    var _this = this;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                urlStream = url.replace('/v/', '/api/source/');
-                headers = {
-                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                };
-                body = {
-                    r: '',
-                    d: 'streamm4u.club'
-                };
-                return [4, libs.request_post(urlStream, headers, qs.stringify(body), 'json')];
+                PROVIDER = 'FSAPI';
+                DOMAIN = "https://fsapi.xyz";
+                urlSearch = DOMAIN + "/tmdb-movie/" + movieInfo.imdb_id;
+                if (movieInfo.type == 'tv') {
+                    urlSearch += "-" + movieInfo.season + "-" + movieInfo.episode;
+                }
+                libs.log(urlSearch, PROVIDER, "URL SEARCH FSAPI");
+                return [4, libs.request_get(urlSearch, {
+                        referer: DOMAIN
+                    }, true)];
             case 1:
-                resultStream = _a.sent();
-                console.log(headers, body, urlStream, resultStream, '-------- RESULT STREAMM4u');
-                if (!resultStream.success) {
-                    return [2];
-                }
-                directs = resultStream.data ? resultStream.data : [];
-                console.log(directs, '------------ DIRECTS STREAMM4u');
-                for (_i = 0, directs_1 = directs; _i < directs_1.length; _i++) {
-                    directItem = directs_1[_i];
-                    console.log(directItem, '----------- DIRECT ITEM STREAMM4u');
-                    if (!directItem.file) {
-                        continue;
+                parseSearch = _a.sent();
+                embeds = [];
+                libs.log(parseSearch('.play-video').length, PROVIDER, 'RESULT SEARCH FSAPI');
+                parseSearch('.play-video').each(function (key, item) {
+                    var href = parseSearch(item).attr('href');
+                    if (href) {
+                        embeds.push(href);
                     }
-                    callback({
-                        file: directItem.file,
-                        host: "StreamM4u",
-                        quality: directItem.label,
-                        provider: config.provider
+                });
+                libs.log(embeds, PROVIDER, 'EMBED FSAPI');
+                arrMap = embeds.map(function (embed) { return __awaiter(_this, void 0, void 0, function () {
+                    var embedRedirect;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4, libs.request_get_redirect_url(embed, {})];
+                            case 1:
+                                embedRedirect = _a.sent();
+                                libs.log(embedRedirect, PROVIDER, 'EMBED');
+                                if (!embedRedirect) return [3, 3];
+                                return [4, libs.embed_redirect(embedRedirect, '', movieInfo, PROVIDER, callback)];
+                            case 2:
+                                _a.sent();
+                                _a.label = 3;
+                            case 3: return [2];
+                        }
                     });
-                }
+                }); });
+                return [4, Promise.all(arrMap)];
+            case 2:
+                _a.sent();
                 return [2];
         }
     });

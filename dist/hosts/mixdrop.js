@@ -35,8 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-hosts["mixdrop"] = function (url, movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
-    var as, html, decrypt, token, number1, number2, decrypt2, iframe, embed, file, fileSize;
+hosts["mixdrop"] = function (url, movieInfo, provider, config, callback) { return __awaiter(_this, void 0, void 0, function () {
+    var as, DOMAIN, HOST, htmlDetail, decrypt, token, number1, number2, decrypt2, iframe, embedPattern, embed;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -64,10 +64,12 @@ hosts["mixdrop"] = function (url, movieInfo, config, callback) { return __awaite
                     }
                     return p;
                 };
+                DOMAIN = 'https://mixdrop.co';
+                HOST = 'MIXDROP';
                 return [4, libs.request_get(url.replace("/f/", "/e/"), {})];
             case 1:
-                html = _a.sent();
-                decrypt = html.match(/\) *\} *\} *return *p\} *\( *\'([^\']+) *\' *\, *([0-9]+) *\, *([0-9]+) *\, *\'([^\']+)/i);
+                htmlDetail = _a.sent();
+                decrypt = htmlDetail.match(/\) *\} *\} *return *p\} *\( *\'([^\']+) *\' *\, *([0-9]+) *\, *([0-9]+) *\, *\'([^\']+)/i);
                 token = decrypt ? decrypt[1] : "";
                 number1 = decrypt ? decrypt[2] : 0;
                 number2 = decrypt ? decrypt[3] : 0;
@@ -76,27 +78,17 @@ hosts["mixdrop"] = function (url, movieInfo, config, callback) { return __awaite
                 if (!token) {
                     return [2];
                 }
-                console.log(token, number1, number2, "--------- MIDROP iframe ----------");
-                embed = iframe.match(/MDCore.wurl="([^\"]+)/i);
-                embed = embed ? embed[1].trim() : "";
-                console.log(embed, "--------- MIDROP EMBED ----------");
+                libs.log({ token: token }, HOST, 'IFRAME');
+                embedPattern = iframe.match(/MDCore.wurl="([^\"]+)/i);
+                embed = embedPattern ? embedPattern[1].trim() : "";
+                libs.log(embed, HOST, 'EMBED');
                 if (!embed) return [3, 3];
                 if (embed.indexOf("https://") == -1 && embed.indexOf("http://") == -1) {
                     embed = embed.replace("//", "https://");
                 }
-                file = embed;
-                return [4, libs.request_getFileSize(file)];
+                return [4, libs.embed_redirect(embed, '', movieInfo, provider, callback, HOST)];
             case 2:
-                fileSize = _a.sent();
-                console.log(file, fileSize, "--------- MIDROP FILE DATA ----------");
-                if (fileSize > 0) {
-                    callback({
-                        file: file,
-                        size: fileSize,
-                        host: "MixDrop",
-                        provider: config.provider
-                    });
-                }
+                _a.sent();
                 _a.label = 3;
             case 3: return [2];
         }

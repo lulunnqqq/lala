@@ -35,41 +35,45 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-hosts["play.playoffsite"] = function (url, movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
-    var playId, urlAjax, headers, body, resultPlay;
+hosts["voe"] = function (url, movieInfo, provider, config, callback) { return __awaiter(_this, void 0, void 0, function () {
+    var uttf0, DOMAIN, HOST, htmlDetail, hlsPattern, hlsLink, qualityPattern, quality, directPattern, decodeDirects, directUrl;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                playId = url.match(/\/v1\/([^\?]+)/i);
-                playId = playId ? playId[1] : '';
-                if (!playId) {
-                    return [2];
-                }
-                urlAjax = "https://api-sing.playoffsite.xyz/apiv2/5e8dd16b70eac4137a676553/" + playId;
-                headers = {
-                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                uttf0 = function (uttp0) {
+                    uttp0 = uttp0.join('');
+                    uttp0 = uttp0.split('').reverse().join('');
+                    ;
+                    return libs.string_atob(uttp0);
                 };
-                body = {
-                    'referrer': 'https://m4ufree.tv',
-                    typeend: 'html'
-                };
-                return [4, libs.request_post(urlAjax, headers, qs.stringify(body), 'json')];
+                DOMAIN = 'https://voe.sx';
+                HOST = 'VOE';
+                return [4, libs.request_get(url, {})];
             case 1:
-                resultPlay = _a.sent();
-                console.log(urlAjax, headers, body, resultPlay, '--------- Playoffsite Result');
-                if (!resultPlay.status) {
-                    return [2];
-                }
-                if (!resultPlay.data) {
-                    return [2];
-                }
-                callback({
-                    file: resultPlay.data,
-                    host: "PlaySite",
-                    quality: 'HLS',
-                    provider: config.provider
-                });
-                return [2];
+                htmlDetail = _a.sent();
+                hlsPattern = htmlDetail.match(/\"hls\" *\: *\"([^\"]+)/i);
+                hlsLink = hlsPattern ? hlsPattern[1] : '';
+                qualityPattern = htmlDetail.match(/\"video_height\" *\: *\"([0-9p]+)/i);
+                quality = qualityPattern ? qualityPattern[1] : 'HLS';
+                libs.log({ hlsLink: hlsLink, quality: quality }, HOST, 'HLS');
+                if (!hlsLink) return [3, 3];
+                return [4, libs.embed_redirect(hlsLink, quality, movieInfo, provider, callback, HOST)];
+            case 2:
+                _a.sent();
+                _a.label = 3;
+            case 3:
+                directPattern = htmlDetail.match(/\= *uttf0\(([^\)]+)/i);
+                decodeDirects = directPattern ? directPattern[1] : [];
+                libs.log(decodeDirects, HOST, 'DECODE DIRECT');
+                if (!(decodeDirects.length > 0)) return [3, 5];
+                directUrl = uttf0(Array.from(decodeDirects));
+                libs.log(directUrl, HOST, 'DIRECT URL');
+                if (!directUrl) return [3, 5];
+                return [4, libs.embed_redirect(directUrl, quality, movieInfo, provider, callback, HOST)];
+            case 4:
+                _a.sent();
+                _a.label = 5;
+            case 5: return [2];
         }
     });
 }); };

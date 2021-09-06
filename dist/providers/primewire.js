@@ -36,22 +36,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 source.getResource = function (movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
-    var config, decode, decodeGsk, urlSearch, htmlSearch, parseSearch, link, linkDetail_1, htmlTv, parseTv_1, htmlEpisode, parseEpisode, sources, userData, sliceUserData, sliceTermData, token, resolve, _i, resolve_1, item, arrMap;
+    var decode, decodeGsk, config, PROVIDER, DOMAIN, urlSearch, parseSearch, LINK_DETAIL, LINK_CUSTOM, parseTv_1, parseEpisode, sources, userData, sliceUserData, sliceTermData, token, resolve, _i, resolve_1, item, arrMap;
     var _this = this;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                config = {
-                    sBox0: null,
-                    sBox1: null,
-                    sBox2: null,
-                    sBox3: null,
-                    pArray: null,
-                    key: null,
-                    mode: "e",
-                    iv: "abc12345",
-                    keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-                };
                 decode = {
                     sBox0: null,
                     sBox1: null,
@@ -298,59 +287,72 @@ source.getResource = function (movieInfo, config, callback) { return __awaiter(_
                         decode.pArray = [608135816, 2242054355, 320440878, 57701188, 2752067618, 698298832, 137296536, 3964562569, 1160258022, 953160567, 3193202383, 887688300, 3232508343, 3380367581, 1065670069, 3041331479, 2450970073, 2306472731].slice(),
                         decode.gsk(e);
                 };
-                urlSearch = "https://www.primewire.li/?s=" + slugify(movieInfo.title, { lower: true, replacement: '+' }) + "&t=y&m=m&w=q";
-                return [4, libs.request_get(urlSearch)];
+                config = {
+                    sBox0: null,
+                    sBox1: null,
+                    sBox2: null,
+                    sBox3: null,
+                    pArray: null,
+                    key: null,
+                    mode: "e",
+                    iv: "abc12345",
+                    keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+                };
+                PROVIDER = 'PRIMEWIRE';
+                DOMAIN = "https://primewire.ag";
+                urlSearch = DOMAIN + "/?s=" + libs.url_slug_search(movieInfo, '+') + "&t=y&m=m&w=q";
+                return [4, libs.request_get(urlSearch, {}, true)];
             case 1:
-                htmlSearch = _a.sent();
-                parseSearch = cheerio.load(htmlSearch);
-                link = "";
-                console.log(urlSearch, parseSearch(".index_item").length, "------------ primewire SEARCH");
-                parseSearch(".index_item").each(function (keySearch, itemSearch) {
-                    var title = parseSearch(itemSearch).find("a").attr("title");
-                    var href = parseSearch(itemSearch).find("a").attr("href");
+                parseSearch = _a.sent();
+                LINK_DETAIL = "";
+                libs.log({ urlSearch: urlSearch, length: parseSearch(".index_item").length }, PROVIDER, 'SEARCH INFO');
+                parseSearch(".index_item").each(function (key, item) {
+                    var title = parseSearch(item).find("a").attr("title");
+                    var href = parseSearch(item).find("a").attr("href");
                     var year = title.match(/\( *([0-9]+)/i);
                     year = year ? year[1] : 0;
                     title = title.replace(/\( *[0-9]+ *\)/i, "").trim();
                     if (title && href) {
-                        href = "https://www.primewire.li" + href;
-                        console.log(title, href, year, "------------ primewire SEARCH");
-                        if (slugify(movieInfo.title, { lower: true, replacement: '+', remove: /[*+~.()'"!:@]/g }) == slugify(title, { lower: true, replacement: '+', remove: /[*+~.()'"!:@]/g })) {
+                        href = "" + DOMAIN + href;
+                        libs.log({ title: title, href: href, year: year }, PROVIDER, 'SEARCH ITEM');
+                        if (libs.string_matching_title(movieInfo, title)) {
                             if (movieInfo.type == "movie" && year == movieInfo.year && href.indexOf("/movie/") != -1) {
-                                link = href;
+                                LINK_DETAIL = href;
                             }
                             if (movieInfo.type == "tv" && year == movieInfo.year && href.indexOf("/tv/") != -1) {
-                                link = href;
+                                LINK_DETAIL = href;
                             }
                         }
                     }
                 });
-                console.log(link, "------------ primewire LINK");
-                if (!(link != "")) return [3, 7];
-                linkDetail_1 = "";
+                libs.log(LINK_DETAIL, PROVIDER, "LINK");
+                if (!LINK_DETAIL) {
+                    return [2];
+                }
+                LINK_CUSTOM = "";
                 if (!(movieInfo.type == "movie")) return [3, 2];
-                linkDetail_1 = link;
+                LINK_CUSTOM = LINK_DETAIL;
                 return [3, 4];
-            case 2: return [4, libs.request_get(link)];
+            case 2: return [4, libs.request_get(LINK_DETAIL, {}, true)];
             case 3:
-                htmlTv = _a.sent();
-                parseTv_1 = cheerio.load(htmlTv);
-                console.log(parseTv_1(".show_season").length, "------------ primewire TV LINK LENGTH");
-                parseTv_1(".show_season").each(function (keySeason, itemSeason) {
-                    var season = parseTv_1(itemSeason).attr("data-id");
-                    console.log(season, "------------ primewire SEASON");
+                parseTv_1 = _a.sent();
+                libs.log({ length: parseTv_1(".show_season").length }, PROVIDER, 'TV LINK LENGTH');
+                parseTv_1(".show_season").each(function (key, item) {
+                    var season = parseTv_1(item).attr("data-id");
+                    libs.log(season, PROVIDER, 'SEASON');
                     if (season == movieInfo.season) {
-                        console.log(parseTv_1(itemSeason).find(".tv_episode_item").length, "------------ primewire TV EPISODE LENGTH");
+                        libs.log({ length: parseTv_1(item).find(".tv_episode_item").length }, PROVIDER, 'TV EPISODE LENGTH');
                         parseTv_1(itemSeason).find(".tv_episode_item").each(function (keyEpisode, itemEpisode) {
                             var hrefEpisode = parseTv_1(itemEpisode).find("a").attr("href");
-                            console.log(hrefEpisode, "------------ primewire HREF EPISODE");
+                            libs.log(hrefEpisode, PROVIDER, 'HREF EPISODE');
                             if (hrefEpisode) {
-                                hrefEpisode = "https://www.primewire.li" + hrefEpisode;
+                                hrefEpisode = "" + DOMAIN + hrefEpisode;
                                 var episode = parseTv_1(itemEpisode).find("a").text();
                                 episode = episode.match(/E([0-9]+)/i);
                                 episode = episode ? episode[1] : 0;
-                                console.log(episode, "------------ primewire EPISODE");
+                                libs.log(episode, PROVIDER, 'EPISODE');
                                 if (episode == movieInfo.episode) {
-                                    linkDetail_1 = hrefEpisode;
+                                    LINK_CUSTOM = hrefEpisode;
                                 }
                             }
                         });
@@ -358,12 +360,11 @@ source.getResource = function (movieInfo, config, callback) { return __awaiter(_
                 });
                 _a.label = 4;
             case 4:
-                console.log(linkDetail_1, "------------ primewire LINK DETAIL");
-                if (!(linkDetail_1 != "")) return [3, 7];
-                return [4, libs.request_get(linkDetail_1)];
+                libs.log(LINK_CUSTOM, PROVIDER, 'LINK_CUSTOM');
+                if (!(LINK_CUSTOM != "")) return [3, 7];
+                return [4, libs.request_get(LINK_CUSTOM, {}, true)];
             case 5:
-                htmlEpisode = _a.sent();
-                parseEpisode = cheerio.load(htmlEpisode);
+                parseEpisode = _a.sent();
                 sources = [];
                 userData = parseEpisode("#user-data").attr("v");
                 sliceUserData = userData.slice(0, 9);
@@ -374,40 +375,23 @@ source.getResource = function (movieInfo, config, callback) { return __awaiter(_
                 if (resolve) {
                     for (_i = 0, resolve_1 = resolve; _i < resolve_1.length; _i++) {
                         item = resolve_1[_i];
-                        sources.push("https://www.primewire.li/links/go/" + item + "?embed=true");
+                        sources.push(DOMAIN + "/links/go/" + item + "?embed=true");
                     }
                 }
-                console.log(sources, resolve, userData, "------------ primewire SOURCES");
+                libs.log({ sources: sources, userData: userData }, PROVIDER, 'SOURCES');
                 arrMap = sources.map(function (item) { return __awaiter(_this, void 0, void 0, function () {
-                    var embed, fileSize, host;
+                    var embed;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
-                            case 0: return [4, libs.request_get(item, {
-                                    "User-Agent": libs.request_getRandomUserAgent(),
-                                }, 'json')];
+                            case 0: return [4, libs.request_get(item, {})];
                             case 1:
                                 embed = _a.sent();
                                 embed = embed.link ? embed.link : '';
+                                libs.log(embed, PROVIDER, "DIRECT EMBED");
                                 if (!embed) return [3, 3];
-                                console.log(embed, "------------ primewire PROPER DIRECT EMBED");
-                                return [4, libs.request_getFileSize(embed)];
+                                return [4, libs.embed_redirect(embed, '', movieInfo, PROVIDER, callback)];
                             case 2:
-                                fileSize = _a.sent();
-                                host = libs.string_getHost(embed);
-                                console.log(embed, fileSize, host, "embed--------------------");
-                                if (fileSize == 0) {
-                                    if (hosts[host]) {
-                                        hosts[host](embed, movieInfo, _.merge(config, { provider: "Primewire" }), callback);
-                                    }
-                                }
-                                else {
-                                    callback({
-                                        file: embed,
-                                        size: fileSize,
-                                        host: host.toUpperCase(),
-                                        provider: "Primewire"
-                                    });
-                                }
+                                _a.sent();
                                 _a.label = 3;
                             case 3: return [2];
                         }

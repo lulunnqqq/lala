@@ -36,30 +36,31 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 source.getResource = function (movieInfo, config, callback) { return __awaiter(_this, void 0, void 0, function () {
-    var domain, urlSearch, htmlSearch, hlsLink;
+    var PROVIDER, DOMAIN, DOMAINAPI, urlSearch, htmlSearch, hlsLink;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                domain = "https://vumoo.to";
-                urlSearch = "https://embed.meomeo.pw/fastmedia/" + movieInfo.imdb_id;
+                PROVIDER = 'VUMOO';
+                DOMAIN = "https://vumoo.to";
+                DOMAINAPI = "https://embed.meomeo.pw";
+                urlSearch = DOMAINAPI + "/fastmedia/" + movieInfo.imdb_id;
                 if (movieInfo.type == 'tv') {
                     urlSearch += "-" + movieInfo.season + "-" + movieInfo.episode;
                 }
                 console.log(urlSearch, 'haah', "URL SEARCH VUMOO");
                 return [4, libs.request_get(urlSearch, {
-                        referer: domain
+                        referer: DOMAIN,
                     })];
             case 1:
                 htmlSearch = _a.sent();
-                console.log(htmlSearch, 'HTML VUMOO');
                 hlsLink = htmlSearch.match(/file *\" *\: *\"([^\"]+)/i);
                 if (hlsLink) {
                     hlsLink = _.startsWith(hlsLink[1], "/") ? "https:" + hlsLink[1] : hlsLink[1];
                     callback({
                         file: hlsLink,
                         quality: 'HLS',
-                        host: "Vumoo",
-                        provider: 'Vumoo'
+                        host: PROVIDER,
+                        provider: PROVIDER
                     });
                 }
                 return [2];
