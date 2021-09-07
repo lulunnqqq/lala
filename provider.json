@@ -4,6 +4,7 @@
 		"dist/providers/5movies.js",
 		"dist/providers/fsapi.js",
 		"dist/providers/primewire.js",
-		"dist/providers/vumoo.js"
+		"dist/providers/vumoo.js",
+		"dist/providers/putlocker.js"
 	]
 }

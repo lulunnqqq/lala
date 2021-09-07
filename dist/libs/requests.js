@@ -224,9 +224,8 @@ libs.request_put = function (url, headers, body) {
         });
     });
 };
-libs.request_post = function (url, headers, body, type) {
+libs.request_post = function (url, headers, body) {
     if (headers === void 0) { headers = {}; }
-    if (type === void 0) { type = ""; }
     return __awaiter(_this, void 0, void 0, function () {
         var defaultHeaders, requestData, e_5;
         return __generator(this, function (_a) {
