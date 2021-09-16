@@ -56,7 +56,7 @@ callbacksEmbed["vidcloud"] = function (dataCallback, host, provider, callback) {
                     file: item.file,
                     quality: '1080p',
                     host: "Server " + ++rank,
-                    provider: provider,
+                    provider: 'Vidcloud',
                 });
             }
             console.log(source1, source2, source3, "responseTextData");
