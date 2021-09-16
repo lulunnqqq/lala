@@ -117,13 +117,7 @@ hosts["vidsrc"] = function (url, movieInfo, provider, config, callback) { return
                                 for (_i = 0, embeds_1 = embeds; _i < embeds_1.length; _i++) {
                                     embed = embeds_1[_i];
                                     libs.log(embed, HOST, 'DIRECT VIDSRC');
-                                    callback({
-                                        file: embed.file,
-                                        size: 0,
-                                        host: HOST,
-                                        quality: embed.label,
-                                        provider: config.provider
-                                    });
+                                    libs.embed_redirect(embed.file, embed.label, movieInfo, provider, callback, HOST);
                                 }
                                 return [3, 13];
                             case 5:
@@ -142,6 +136,7 @@ hosts["vidsrc"] = function (url, movieInfo, provider, config, callback) { return
                             case 7:
                                 if (!(i < length_1)) return [3, 10];
                                 file = parse[i].file;
+                                if (!file) return [3, 9];
                                 return [4, libs.embed_redirect(file, '', movieInfo, provider, callback, HOST)];
                             case 8:
                                 _a.sent();

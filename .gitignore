@@ -5,3 +5,5 @@ package.json
 package-lock.json
 tsconfig.json
 ts_2
+.dccache
+.DS_Store

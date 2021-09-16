@@ -130,7 +130,9 @@ libs.request_get = function (url, headers, isCheerio) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
                     defaultHeaders = headers;
-                    defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    if (!defaultHeaders['user-agent']) {
+                        defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    }
                     return [4, axiosS.get(url, {
                             headers: defaultHeaders,
                         })];
@@ -158,12 +160,16 @@ libs.request_head = function (url, headers) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
                     defaultHeaders = headers;
-                    defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    if (!defaultHeaders['user-agent']) {
+                        defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    }
                     return [4, axiosS.head(url, {
                             headers: defaultHeaders,
+                            withCredentials: true,
                         })];
                 case 1:
                     requestData = _a.sent();
+                    console.log(requestData, 'haaha');
                     return [2, requestData.headers];
                 case 2:
                     e_2 = _a.sent();
@@ -183,7 +189,9 @@ libs.request_get_redirect_url = function (url, headers) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
                     defaultHeaders = headers;
-                    defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    if (!defaultHeaders['user-agent']) {
+                        defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    }
                     return [4, axiosS.get(url, {
                             headers: defaultHeaders,
                         })];
@@ -208,7 +216,9 @@ libs.request_put = function (url, headers, body) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
                     defaultHeaders = headers;
-                    defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    if (!defaultHeaders['user-agent']) {
+                        defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    }
                     return [4, axiosS.put(url, body, {
                             headers: defaultHeaders,
                         })];
@@ -224,7 +234,7 @@ libs.request_put = function (url, headers, body) {
         });
     });
 };
-libs.request_post = function (url, headers, body) {
+libs.request_post = function (url, headers, body, isCheerio) {
     if (headers === void 0) { headers = {}; }
     return __awaiter(_this, void 0, void 0, function () {
         var defaultHeaders, requestData, e_5;
@@ -233,7 +243,9 @@ libs.request_post = function (url, headers, body) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
                     defaultHeaders = headers;
-                    defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    if (!defaultHeaders['user-agent']) {
+                        defaultHeaders['user-agent'] = libs.request_getRandomUserAgent();
+                    }
                     return [4, axiosS.post(url, body, {
                             headers: defaultHeaders,
                         })];
