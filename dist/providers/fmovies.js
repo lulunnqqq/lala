@@ -96,7 +96,7 @@ source.getResource = function (movieInfo, config, callback) { return __awaiter(_
             case 4:
                 parseGetSeason_1 = _a.sent();
                 seasonId_1 = 0;
-                libs.log({ apiUrlGetSeason: apiUrlGetSeason, length: parseGetSeason_1('.ss-item'), length: length }, PROVIDER, "SEASSON INFO");
+                libs.log({ apiUrlGetSeason: apiUrlGetSeason, length: parseGetSeason_1('.ss-item').length }, PROVIDER, "SEASSON INFO");
                 parseGetSeason_1('.ss-item').each(function (key, item) {
                     var season = parseGetSeason_1(item).text();
                     var seasonDataId = parseGetSeason_1(item).attr('data-id');
@@ -157,7 +157,7 @@ source.getResource = function (movieInfo, config, callback) { return __awaiter(_
                 getLinkEmbedData = _a.sent();
                 libs.log({ getLinkEmbedData: getLinkEmbedData }, PROVIDER, 'LINK EMBED DATA');
                 if (!(getLinkEmbedData && getLinkEmbedData.link)) return [3, 11];
-                return [4, libs.embed_redirect(getLinkEmbedData.link, '', movieInfo, PROVIDER, callback)];
+                return [4, libs.embed_redirect(getLinkEmbedData.link, '', movieInfo, PROVIDER, callback, '')];
             case 10:
                 _a.sent();
                 _a.label = 11;
