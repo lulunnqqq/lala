@@ -41,7 +41,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 };
 var _this = this;
 callbacksEmbed["vidcloud"] = function (dataCallback, host, provider, callback) { return __awaiter(_this, void 0, void 0, function () {
-    var data, parse, source1, source2, source3, _i, source3_1, item;
+    var data, parse, source1, source2, source3, rank, _i, source3_1, item;
     return __generator(this, function (_a) {
         data = JSON.parse(dataCallback);
         if (data.responseURL.indexOf("getSources") != -1) {
@@ -49,12 +49,13 @@ callbacksEmbed["vidcloud"] = function (dataCallback, host, provider, callback) {
             source1 = parse['sources_1'];
             source2 = parse['sources_2'];
             source3 = __spreadArray(__spreadArray([], source1), source2);
+            rank = 0;
             for (_i = 0, source3_1 = source3; _i < source3_1.length; _i++) {
                 item = source3_1[_i];
                 callback({
                     file: item.file,
                     quality: '1080p',
-                    host: host,
+                    host: "Server " + ++rank,
                     provider: provider,
                 });
             }
